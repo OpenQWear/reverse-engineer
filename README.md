@@ -127,7 +127,7 @@
 
 **设置修改要点**:
 1. 发送时 `value` 字段是 JSON **字符串**（二次编码），接收确认时是已解析的 JSON **对象**
-2. 修改复合对象中的任意字段，需发送**完整**对象（非增量更新）
+2. 修改复合对象中的任意字段，需发送**完整**对象
 3. 设置变更后，眼镜通过 NS=16 cmd=1 广播状态变化事件
 
 #### 2.3.1 screenConfig
@@ -350,7 +350,7 @@ hook(connectGatt).intercept { chain ->
 
 ### 4.1 概述
 
-在目标 App 进程内启动 TCP Server (监听 `127.0.0.1:37373`)，将拦截到的 PDU 数据和设备信息通过 JSON-RPC 协议对外暴露。同一设备上的独立 GUI App 通过 TCP 连接访问这些数据。
+在目标 App 进程内启动 TCP Server，将拦截到的 PDU 数据和设备信息通过 JSON-RPC 协议对外暴露。通过 TCP 连接访问这些数据。
 
 ### 4.2 数据结构
 
@@ -402,7 +402,6 @@ hook(connectGatt).intercept { chain ->
 |------|------|------|
 | GMA 状态 | `onStateChanged` 回调 | 最可靠，直接反映眼镜 BLE 连接 |
 | BLE GATT | `onConnectionStateChange` | 底层蓝牙连接 |
-| PDU 流量 | 最近 30 秒内有 PDU 收发 | 兜底检测 (兼容原生 BLE 方案) |
 
 ---
 
@@ -411,7 +410,7 @@ hook(connectGatt).intercept { chain ->
 ### 5.1 环境准备
 
 - Android 设备 (已 root，安装 LSPosed 等注入框架)
-- 配套 App (厂商官方版本)
+- 配套 App
 - JDK 17+
 - jadx
 
