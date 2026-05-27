@@ -22,24 +22,24 @@
 ### 1.2 拦截层次
 
 ```
-┌──────────────────────────────────────┐
-│  Layer 1: BLE GATT 回调              │
-│  BluetoothGattCallback               │
-│  ├─ onCharacteristicChanged (RX)    │
-│  ├─ onConnectionStateChange (状态)  │
-│  └─ writeCharacteristic (TX)        │
-├──────────────────────────────────────┤
-│  Layer 2: GMA 客户端                 │
-│  单例类 (~30 方法)                    │
-│  ├─ sendCommand(msg, callback)       │
-│  ├─ addObserver(listener)            │
-│  └─ addStateListener(listener)       │
-├──────────────────────────────────────┤
-│  Layer 3: GMA 数据回调               │
-│  ├─ onDeviceResponse(type, data)    │
-│  ├─ onReceiveCommandData(msg)       │
-│  └─ onStateChanged(state)           │
-└──────────────────────────────────────┘
+┌─────────────────────────────────────
+│  Layer 1: BLE GATT 回调
+│  BluetoothGattCallback
+│  ├─ onCharacteristicChanged (RX)
+│  ├─ onConnectionStateChange (状态)
+│  └─ writeCharacteristic (TX)
+├─────────────────────────────────────
+│  Layer 2: GMA 客户端
+│  单例类 (~30 方法)
+│  ├─ sendCommand(msg, callback)
+│  ├─ addObserver(listener)
+│  └─ addStateListener(listener)
+├─────────────────────────────────────
+│  Layer 3: GMA 数据回调
+│  ├─ onDeviceResponse(type, data)
+│  ├─ onReceiveCommandData(msg)
+│  └─ onStateChanged(state)
+└─────────────────────────────────────
 ```
 
 建议在 **Layer 2 (GMA 客户端层)** 进行主要拦截，因为该层已解析 GMA 帧头，可直接获取 namespace/command/payload。Layer 1 作为补充，用于捕获连接状态变化和原始 PDU。
@@ -130,7 +130,7 @@
 2. 修改复合对象中的任意字段，需发送**完整**对象（非增量更新）
 3. 设置变更后，眼镜通过 NS=16 cmd=1 广播状态变化事件
 
-#### 2.3.1 screenConfig 复合设置
+#### 2.3.1 screenConfig
 
 ```json
 {
