@@ -80,7 +80,7 @@
 | 7 | CAMERA | 相机/拍照 |
 | 8 | SETTINGS | **设备设置** |
 | 9 | TRANS | 翻译 |
-| 14 | AGDS_TRANS | AGDS 数据传输 |
+| 14 | AGDS_TRANS | AGDS 翻译 |
 | 15 | CY_APP | 应用事件 |
 | 16 | GW_REQ | 设备状态广播 |
 | 17 | NOTIFICATION | 通知推送 |
@@ -208,7 +208,7 @@ AI 语音助手通信使用 NS=23 cmd=1 (数据) 和 NS=33 cmd=2 (响应)，payl
 
 ### 3.2 Hook 点 1: GMA 客户端
 
-**目标类特征**: 单例模式，约 30 个公开方法，包含 `getInstance`、`sendCommand` 以及多个 `addXxxObserver`/`addXxxListener` 注册方法。
+**目标类特征**: 单例模式，包含 `getInstance`、`sendCommand` 以及多个 `addXxxObserver`/`addXxxListener` 注册方法。
 
 **实现要点**:
 
@@ -401,7 +401,7 @@ hook(connectGatt).intercept { chain ->
 
 ### 4.5 连接状态检测
 
-连接状态综合以下三个信号判断：
+连接状态综合以下两个信号判断：
 
 | 信号 | 来源 | 说明 |
 |------|------|------|
