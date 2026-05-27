@@ -30,7 +30,6 @@
 │  └─ writeCharacteristic (TX)
 ├─────────────────────────────────────
 │  Layer 2: GMA 客户端
-│  单例类 (~30 方法)
 │  ├─ sendCommand(msg, callback)
 │  ├─ addObserver(listener)
 │  └─ addStateListener(listener)
