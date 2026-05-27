@@ -201,7 +201,7 @@ AI 语音助手通信使用 NS=23 cmd=1 (数据) 和 NS=33 cmd=2 (响应)，payl
 - 目标 App 已安装并运行
 - Xposed 模块需在目标 App 的**主进程**中加载（GMA 通信在主进程）
 
-### 3.2 Hook 点 1: GMA 客户端 (核心)
+### 3.2 Hook 点 1: GMA 客户端
 
 **目标类特征**: 单例模式，约 30 个公开方法，包含 `getInstance`、`sendCommand` 以及多个 `addXxxObserver`/`addXxxListener` 注册方法。
 
@@ -315,7 +315,7 @@ hook(writeCharacteristic).intercept { chain ->
 }
 ```
 
-### 3.6 Hook 点 5: BLE 连接入口 (辅助)
+### 3.6 Hook 点 5: BLE 连接入口
 
 ```kotlin
 // BluetoothDevice.connectGatt — 捕获返回的 BluetoothGatt 实例
@@ -344,25 +344,6 @@ hook(connectGatt).intercept { chain ->
 //    - 或提供回调以等待响应
 ```
 
-### 3.8 Hook 检测方法 (适配新 App)
-
-如需在新的配套 App 上找到 Hook 点：
-
-1. **反编译 APK** 使用 jadx
-2. **搜索 GMA 客户端类**:
-   ```bash
-   grep -r "sendCommand.*addGMAStateListener\|getInstance.*sendCommand" sources/
-   ```
-3. **搜索 BLE 回调类**:
-   ```bash
-   grep -r "extends BluetoothGattCallback\|BluetoothGattCallback()" sources/
-   ```
-4. **搜索 PDU 消息类** (通过字段名):
-   ```bash
-   grep -r "nameSpace\|commandId\|commandData" sources/
-   ```
-5. **安装 LSPosed 模块，查看日志** 确认 `GMAClient found` 和 hooks installed
-
 ---
 
 ## 4. TCP Bridge 设计
@@ -374,12 +355,11 @@ hook(connectGatt).intercept { chain ->
 ### 4.2 数据结构
 
 **PDU 历史缓冲**:
-- 最近 50 条发送 + 50 条接收 PDU
 - 每条包含: `ns`, `cmd`, `hex` (完整 PDU hex), `timestamp`
 - 累计计数器: `totalSentCount`, `totalRecvCount` (AtomicLong)
 
 **设备信息缓存**:
-- `ConcurrentHashMap<String, String>` — 存储 52 个设备设置项
+- `ConcurrentHashMap<String, String>` — 存储设备设置项
 - 通过解析 NS=255 的 `onDeviceResponse` 回调自动累积更新
 
 ### 4.3 JSON-RPC 命令列表
@@ -430,10 +410,10 @@ hook(connectGatt).intercept { chain ->
 
 ### 5.1 环境准备
 
-- Android 设备 (已 root，安装 LSPosed)
+- Android 设备 (已 root，安装 LSPosed 等注入框架)
 - 配套 App (厂商官方版本)
-- JDK 17+, Android SDK Platform 34+
-- jadx (用于反编译分析)
+- JDK 17+
+- jadx
 
 ### 5.2 构建 Xposed 模块
 
@@ -459,19 +439,7 @@ adb install app/build/outputs/apk/debug/app-debug.apk
 # 5. LSPosed 管理器 → 启用模块 → 勾选目标 App → 重启目标 App
 ```
 
-### 5.3 适配不同设备
-
-| 需要修改的项 | 位置 | 说明 |
-|------------|------|------|
-| 目标 App 包名 | 模块入口 | `if (packageName != "xxx") return` |
-| 眼镜 BLE MAC | GATT 回调 Hook | 用于过滤目标设备 |
-| BLE Service UUID | GATT 回调 Hook | GMA 主服务 UUID |
-| GMA Write/Notify UUID | GATT 回调 Hook | 发送/接收特性 UUID |
-| GMA 客户端类名 | 核心 Hook | `classLoader.loadClass(...)` |
-| PDU 字段名 | 反射提取 | `nameSpace`/`commandId`/`commandData` |
-| 设置标识符列表 | 设置解析 | 可能需要通过抓包更新 |
-
-### 5.4 验证 Hook 生效
+### 5.3 验证 Hook 生效
 
 ```
 # 查看 LSPosed 日志
